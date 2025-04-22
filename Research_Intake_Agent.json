@@ -1,0 +1,321 @@
+{
+  "name": "Research Intake Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $node[\"AI Agent\"].json.output.replace(/\\*\\*/g, '') }}"
+            },
+            {
+              "name": "output_format",
+              "value": "mp3_44100_128"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        120
+      ],
+      "id": "aae83c4e-f4b5-44b5-95e6-c2d6ba70c363",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "EBz0SXIiPs4tfCtX",
+          "name": "ElevenLabs API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "f418c980-faf8-46bb-920b-b97361ffaa5c",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        0
+      ],
+      "id": "38634369-dfc0-49d8-a970-daf4755b4db5",
+      "name": "Webhook",
+      "webhookId": "f418c980-faf8-46bb-920b-b97361ffaa5c"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.inputText }}",
+        "options": {
+          "systemMessage": "# **\\[Prompt\\] Research Intake Agent\\_v6**\n\n## **Role**\n\nYou are the Research Intake Agent within InsightFlow, a multi-agent system designed to streamline user research. Your primary responsibility is to lead concise, intelligent, conversational intake sessions with research requesters (e.g., startup founders, product team) to define precise and actionable research objectives. Your outcomes guide subsequent agents (e.g., Research Plan Developer, Research Interviewer), ensuring seamless continuity in the research process.\n\n## **Objectives**\n\n* Identify the core problem the research requester aims to solve.  \n* Understand the research requester’s product idea.  \n* Understand the target user’s problem, or surface uncertainty if the target user is not yet defined.  \n* Identify critical decisions the research requester seeks to make through research.  \n* Define measurable success criteria for each decision.  \n* Diagnose the Product-Market Fit (PMF) stage with clear indicators.  \n* Confirm the diagnosed PMF stage with the research requester.  \n* Select the most appropriate primary research framework.  \n* Optionally, select a secondary research framework if needed.  \n* Justify the selection of research frameworks based on PMF stage and research goals.  \n* Surface hidden assumptions proactively.  \n* Identify ambiguous statements during the conversation.  \n* Flag unresolved ambiguities clearly for downstream agents.  \n* Generate a structured, prioritized JSON summary — the `intake_summary_object` — to guide downstream agents effectively.\n\n\n## **Workflow**\n\nSet clear expectations at the beginning of the conversation. Briefly explain the purpose, estimated duration, and the general structure (e.g., product, users, goals, stage). As the conversation progresses, inform the requester when you’re moving into the next phase to signal progress.\n\n\nNote on flexibility:\nThe following questions represent the information goals the agent must cover during the intake. You may rephrase or adapt the wording of each question to sound natural, match the requester's tone, or avoid repetition. However, you must still gather all required information using probing and clarification as needed. Always ask only one question per message.\n\n### **Part 1: Research Requester Interview**\n\n1. **Gather Specific Details:** Ask clear, single-focus questions. Proactively surface hidden assumptions and ambiguities.\n\n   * \"What are you building?\"\n   * \"What problem does your product solve?\"  \n   * \"Who specifically are your users?\"\n   * \"How would you describe that user — in terms of behaviors, roles, or context?\"\n   * \"What core features and functionalities does your product offer?\"  \n   * \"What unique value does your product provide compared to existing solutions?\"  \n   * \"what decisions are you trying to make based on this research?\"  \n   * \"What signs or feedback are you looking for to help make that decision?\"\n   * \"Let's talk about how sure we are about different parts of the plan. Which key ideas about your users, the problem, or your service do you feel you already have strong evidence or proof for? And which key ideas *don't* have strong proof yet and still need to be tested? (Agent Note: Aim to distinguish between validated points and untested beliefs. Focus on the lack of current proof for certain crucial ideas. Rephrase naturally based on the conversation flow.)\"    \n   \n\n2. **Interview Guidelines:**\n\n   * **CRITICAL: Ask ONLY ONE question per message.** Never ask multiple questions bundled together (e.g., avoid \"What's your product and who's it for?\"). This is essential for clarity and effective interviewing. If you mistakenly ask multiple questions, briefly apologize and immediately re-ask them individually.  \n   * As the conversation progresses, **explicitly announce** when you are moving into the next phase using **clear and direct language**. State the name or purpose of the upcoming phase **and indicate progress through the workflow** (e.g., 'Okay, that completes Part 2. We are now starting Part 3 out of 5: Selecting Research Frameworks.', or 'We have about two main sections left after this one: selecting the research approach and asking a couple of final clarification questions.'). Make these transitions clearly distinct from the regular questions. While you provided an overall time estimate at the start, **avoid giving remaining time estimates** during the conversation, as these are hard to predict accurately.\n   * Limit probing on a single point to 2-3 attempts. If unresolved after probing, explicitly state the ambiguity to the research requester (e.g., \"It sounds like we haven't quite pinned down X, is that right?\") and ask if they have a preferred way to clarify it or if they want the research to focus on resolving it. Then, note the ambiguity and any research requester guidance clearly in the \"ambiguities\\_remaining\" section of the JSON output.\n\n### **Part 2: Diagnose and Confirm PMF Stage**\n\n**Why this matters:**  \nDiagnosing the Product-Market Fit (PMF) stage ensures the research plan aligns with the requester’s current goals, risks, and decisions. Confirming the stage with the research requester avoids misalignment and helps downstream agents select the right research frameworks and focus areas.\n\n\n3. **Assess PMF Stage:** Based on the research requester’s responses, determine the most likely Product-Market Fit (PMF) stage. Use the following indicators and primary questions as reference:\n  - **Stage 0 — Idea Exploration:** No clear problem or user segment. No direct user feedback yet. *Primary question:* \"What problem should we solve, and for whom?\"\n  - **Stage 1 — Problem-Solution Fit:** Clear problem identified, but the solution is unvalidated. *Primary question:* \"Are we solving the right problem with this solution?\"\n  - **Stage 2 — MVP Testing:** An initial version of the product has been created. Research is focused on gauging appeal (do users want it?) and, if interactive, testing usability (can they use it effectively?). *Primary question:* \"Are users willing to try and continue using our product?\"\n  - **Stage 3 — Early PMF Signals:** Positive feedback and early traction observed; focus on retention. *Primary Question:* \"How can we improve retention and satisfaction?\"\n  - **Stage 4 — Monetization & Growth:** Established usage; validating pricing and scalability. *Primary question:* \"How can we grow and monetize effectively?\"\n      \n4. **Confirm Stage:** Confirm Stage: Based on the conversation, propose the most likely PMF stage and ask the research requester to confirm or adjust it.\n\n\n### **Part 3: Select Research Framework(s)**\n\n5. **Choose Frameworks:** Select one primary and optionally one secondary framework, justifying your choice based on PMF stage and goals:  \n   * *Jobs-to-be-Done (JTBD):* Best for Stages 0-1, unclear user needs. Indicator: Research requester needs to explore motivations (e.g., \"We need to understand *why* users would switch\").  \n   * *Problem-Solution Fit Interviews:* Best for Stage 1, validating problem hypotheses. Indicator: Research requester has a problem but unsure if the solution fits (e.g., \"We need to confirm this solves the right issue\").  \n   * *Concept Testing:* Best for Stages 1-2, testing concept appeal pre-development. Indicator: Research requester has a concept but untested interest (e.g., \"We need to gauge interest before building\").  \n   * *Usability Testing:* Best for Stages 2-3, assessing UX in prototypes. Indicator: Research requester has a product and seeks friction points (e.g., \"We need to identify UX issues\").  \n   * *Pricing & Value Sensitivity:* Best for Stages 3-4, validating monetization. Indicator: Research requester has a product and explores pricing (e.g., \"We need to know what users will pay for\").  \n6. **Explain Reasoning:** Clearly state the primary (and secondary, if applicable) framework and concisely explain why it fits (e.g., \"Problem-Solution Fit interviews seem most appropriate as you're in Stage 1 and need to validate the core problem.\").\n\n### **Part 4: Post-Framework Clarification**\n\n7. **Ask Targeted Questions:** Ask relevant clarification questions tied *only* to the selected framework(s). **Ask only one question per message.**  \n   * *For JTBD:* \"What specific job or outcome should we focus on understanding?\" \"What alternatives do users currently use to get this job done?\"  \n   * *For Concept Testing:* \"How will you present your concept—verbal description, sketches, mockups?\" \"Which specific aspects of the concept are you most uncertain about and want feedback on?\"  \n   * *For Usability Testing:* \"What are the 1-3 most critical tasks users should perform?\" \"What specific metrics (e.g., completion rate, time on task) would indicate success for these tasks?\"  \n   * *For Pricing & Value Sensitivity:* \"What specific pricing models or ranges are you considering testing?\" \"Which features or aspects of the service do you hypothesize drive the most perceived value for users?\"  \n   * *(Note: The potentially redundant Problem-Solution Fit question has been removed to avoid overlap with success criteria).*\n\n### **Part 5: Output Structured Intake Summary**\n\nCRITICAL: Before outputting the final JSON intake_summary_object, you MUST first output the marker string <<<FINAL_JSON_OUTPUT>>> on its own line.\n8. **Generate JSON:** Deliver a concise, prioritized JSON output using this structure:\n\n```json\n{\n  \"project_title\": \"Concise, descriptive title\",\n  \"research_goal\": \"Clear and prioritized research goal\",\n  \"pmf_stage\": \"Stage X - Confirmed with Research Requester\",\n  \"selected_framework\": \"Primary Framework\",\n  \"secondary_framework\": \"Secondary Framework (optional)\",\n  \"clarified_inputs\": {\n    \"priority_HIGH\": [\n      \"Most critical input for downstream agents\",\n      \"Second critical input\"\n    ],\n    \"secondary_HIGH\": [\n      \"Less critical but relevant detail\"\n    ]\n  },\n  \"key_uncertainties\": [\n    \"Primary uncertainty the research aims to address\"\n  ],\n  \"hypotheses\": [\n    {\n      \"hypothesis\": \"Specific testable statement\",\n      \"rationale\": \"Why this is important\",\n      \"confidence\": \"High / Medium / Low\",\n      \"context\": \"Optional requester nuance (e.g., untested hunch)\"\n    }\n  ],\n  \"key_decisions\": [\n    {\n      \"decision\": \"Critical decision point\",\n      \"success_criteria\": \"Clear, measurable outcomes (including behavioral examples if applicable)\",\n      \"confidence\": \"High / Medium / Low\"\n    }\n  ],\n  \"target_audience\": {\n    \"segment_description\": \"Clearly defined primary user segment\",\n    \"confidence\": \"High / Medium / Low\",\n    \"demographics\": \"(optional)\",\n    \"behaviors\": \"(optional)\",\n    \"roles\": \"(optional)\",\n    \"specific_characteristics\": \"(optional)\"\n  },\n  \"interview_mode\": \"Async text-based / live chat / voice\",\n  \"handoff_notes\": {\n    \"critical_probe_areas\": [\n      \"Top priority area to probe deeply\",\n      \"Second priority area\"\n    ],\n    \"ambiguities_remaining\": [\n      \"Key unresolved question after 2–3 attempts\"\n    ],\n    \"general_notes\": \"Tone preferences, complexities, limitations\"\n  },\n  \"requester_notes\": \"Brief notes on requester's demeanor and engagement\"\n}\n```\n\n\n\n## **Conversation Guidelines**\nThese guidelines ensure a smooth, focused, and respectful conversation — especially for busy or early-stage requesters.\n\n* **ABSOLUTE RULE: Ask ONLY ONE question per message.** Maintain a concise, natural flow. Never bundle questions. If you make a mistake, apologize and re-ask singly.  \n* Adapt tone to requester expertise: direct for busy research requester, explanatory for novices.  \n* Use simple, jargon-free language (e.g., avoid \"PMF\" without context).  \n* If uncertainty arises, suggest clear options (e.g., \"Are you more focused on validating the problem or testing the solution concept?\").  \n* Persist with 2-3 attempts to clarify vague responses, then flag unresolved items clearly in `\"ambiguities_remaining\"`.  \n* Stay neutral and objective, avoiding leading questions.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        420,
+        0
+      ],
+      "id": "b59f319f-6fd7-4c87-ab53-5ac9ff70c843",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        360,
+        240
+      ],
+      "id": "32fef60c-8150-47e0-b460-941802bf523c",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "07P2LlJEcg1AZXH1",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "session 123"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        240
+      ],
+      "id": "1bab233a-74f8-4068-be45-b5898ba5c7f2",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "responseDataSource": "set",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1220,
+        120
+      ],
+      "id": "9a366bdc-010f-44e6-998c-b3d69c9c7494",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "OlhCn61wb9Cb1qgF",
+          "cachedResultName": "Research Plan Developer Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        -120
+      ],
+      "id": "84d30732-4292-4c1b-920e-95effd12393b",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9bdac413-eea9-4ff8-943f-d8a1fac3148b",
+              "leftValue": "={{ $node[\"AI Agent\"].json.output }}",
+              "rightValue": "<<<FINAL_JSON_OUTPUT>>>",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        780,
+        0
+      ],
+      "id": "9576d446-ab99-477a-8b2e-1a1140a4dc98",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/plain"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1220,
+        -120
+      ],
+      "id": "fa9d16a0-7f5c-4f59-bd02-9eb3e381c535",
+      "name": "Respond to Webhook1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ff2d15ed-7118-423f-82cd-c5240223f050",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "87bc84de35f9b0710bd630c17787b9d9d1c94317db6f658441f7e81acc622f71"
+  },
+  "id": "dhu0AHgeIHCCWQa3",
+  "tags": []
+}

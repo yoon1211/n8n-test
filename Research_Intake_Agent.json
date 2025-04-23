@@ -1,5 +1,5 @@
 {
-  "name": "Research Intake Agent_copy",
+  "name": "Research Intake Agent",
   "nodes": [
     {
       "parameters": {
@@ -25,15 +25,15 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1040,
-        120
+        0,
+        240
       ],
-      "id": "aae83c4e-f4b5-44b5-95e6-c2d6ba70c363",
+      "id": "67690d71-3447-4810-8a72-f764b1cec1cb",
       "name": "HTTP Request",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "EBz0SXIiPs4tfCtX",
-          "name": "ElevenLabs API Key"
+          "id": "rnrZVACDF6GnJXA8",
+          "name": "ElevenLabs Paid Header Auth"
         }
       }
     },
@@ -47,10 +47,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        200,
-        0
+        -840,
+        120
       ],
-      "id": "38634369-dfc0-49d8-a970-daf4755b4db5",
+      "id": "d9daaa58-f53a-44f3-ad9a-bb644d88766c",
       "name": "Webhook",
       "webhookId": "f418c980-faf8-46bb-920b-b97361ffaa5c"
     },
@@ -65,36 +65,11 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.8,
       "position": [
-        420,
-        0
+        -620,
+        120
       ],
-      "id": "b59f319f-6fd7-4c87-ab53-5ac9ff70c843",
+      "id": "6ec69cbe-02cd-4b2b-9733-3bc649eede8f",
       "name": "AI Agent"
-    },
-    {
-      "parameters": {
-        "model": {
-          "__rl": true,
-          "value": "gpt-4o-mini",
-          "mode": "list",
-          "cachedResultName": "gpt-4o-mini"
-        },
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.2,
-      "position": [
-        360,
-        240
-      ],
-      "id": "32fef60c-8150-47e0-b460-941802bf523c",
-      "name": "OpenAI Chat Model1",
-      "credentials": {
-        "openAiApi": {
-          "id": "07P2LlJEcg1AZXH1",
-          "name": "n8n free OpenAI API credits"
-        }
-      }
     },
     {
       "parameters": {
@@ -104,10 +79,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        480,
-        240
+        -540,
+        340
       ],
-      "id": "1bab233a-74f8-4068-be45-b5898ba5c7f2",
+      "id": "ec57778a-8b04-4f35-8b58-4c8a5278a395",
       "name": "Simple Memory"
     },
     {
@@ -128,10 +103,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        1220,
-        120
+        180,
+        240
       ],
-      "id": "9a366bdc-010f-44e6-998c-b3d69c9c7494",
+      "id": "42e0e83c-0919-4ed4-8d3d-93286ecb451f",
       "name": "Respond to Webhook"
     },
     {
@@ -157,10 +132,10 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        1040,
-        -120
+        0,
+        0
       ],
-      "id": "84d30732-4292-4c1b-920e-95effd12393b",
+      "id": "d32c22d0-bebb-4a6a-b385-d94cf99f1e73",
       "name": "Execute Workflow"
     },
     {
@@ -190,10 +165,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        780,
-        0
+        -260,
+        120
       ],
-      "id": "9576d446-ab99-477a-8b2e-1a1140a4dc98",
+      "id": "fd0bb766-fc4c-4263-834b-27484faa754b",
       "name": "If"
     },
     {
@@ -213,11 +188,31 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        1220,
-        -120
+        180,
+        0
       ],
-      "id": "fa9d16a0-7f5c-4f59-bd02-9eb3e381c535",
+      "id": "16aa25ed-aaf8-48e7-8a6c-ebe424018b35",
       "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro-exp-03-25",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -680,
+        340
+      ],
+      "id": "5db62763-19b9-4fd7-87e5-7759e035752d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "dxata9Vtxdv5bei8",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -250,17 +245,6 @@
           {
             "node": "If",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "OpenAI Chat Model1": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -305,17 +289,28 @@
           }
         ]
       ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "ff2d15ed-7118-423f-82cd-c5240223f050",
+  "versionId": "7477f2f1-f795-4c0d-92f0-b04990fe9902",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "87bc84de35f9b0710bd630c17787b9d9d1c94317db6f658441f7e81acc622f71"
+    "instanceId": "c494c8787311fef9d05a5f6f35a3cac243a70f5bd6ba11eeee48c0356e83c4b5"
   },
-  "id": "dhu0AHgeIHCCWQa3",
+  "id": "32Zzuk73dCxOQ63h",
   "tags": []
 }

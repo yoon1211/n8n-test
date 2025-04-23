@@ -1,0 +1,88 @@
+body {
+    background-image: url('https://images.pexels.com/photos/11167645/pexels-photo-11167645.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    /* Add properties for background image */
+    background-size: cover; /* Scale the image to cover the entire element */
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-attachment: fixed; /* Optional: Makes background fixed during scroll */
+    min-height: 100vh; /* Ensure body takes full viewport height */
+    color: #fff; /* Change default text color to white for better contrast on dark backgrounds */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7); /* Add shadow for readability */
+}
+
+h1, h2 {
+    /* Keep existing color or adjust if needed for contrast */
+     color: #fff; /* Changed to white */
+     text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+}
+
+#status {
+    margin: 10px 0;
+    font-weight: bold;
+    min-height: 1.2em;
+    background-color: rgba(0, 0, 0, 0.5); /* Add semi-transparent background */
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+#recordButton {
+    padding: 15px 25px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4CAF50; /* Keep green */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+
+#recordButton.recording {
+    background-color: #f44336; /* Keep red when recording */
+}
+
+#yourInput, #agentResponse {
+    margin-top: 5px;
+    padding: 10px;
+    /* Make input/response boxes semi-transparent */
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid #ccc; /* Lighter border */
+    border-radius: 4px;
+    min-height: 40px;
+    width: 80%;
+    max-width: 600px;
+    text-align: left;
+    white-space: pre-wrap; /* Keep formatting */
+    color: #333; /* Text color inside boxes back to dark */
+    text-shadow: none; /* Remove shadow inside boxes */
+}
+
+/* Add the keyframes and pulsating class */
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+.pulsating {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+#researchPlanOutput {
+    margin-top: 5px;
+    padding: 10px;
+    /* Make input/response boxes semi-transparent */
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid #ccc; /* Lighter border */
+    border-radius: 4px;
+    min-height: 40px;
+    width: 80%;
+    max-width: 600px;
+    text-align: left;
+    white-space: pre-wrap; /* Keep formatting */
+    color: #333; /* Text color inside boxes back to dark */
+    text-shadow: none; /* Remove shadow inside boxes */
+}
